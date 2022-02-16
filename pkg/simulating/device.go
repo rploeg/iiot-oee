@@ -266,7 +266,8 @@ func (d *centralDevice) sendTelemetryMessage(body []byte) bool {
 	log.Trace().Str("payload", string(body)).Int("size", len(body)).Msg("about to send telemetry message")
 	correlationID, _ := uuid.GenerateUUID()
 	messageID, _ := uuid.GenerateUUID()
-	timeoutCtx, _ := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+	timeoutCtx, cancel := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+	defer cancel()
 	err := d.iotHubClient.SendEvent(timeoutCtx, body,
 		iotdevice.WithSendCorrelationID(correlationID),
 		iotdevice.WithSendMessageID(messageID),
@@ -320,7 +321,8 @@ func (d *centralDevice) sendReportedProperties(reportedProps *models.ReportedPro
 	reportedTwin["hostTime"] = reportedProps.HostTime
 
 	// send the reported properties to IoT Central
-	timeoutCtx, _ := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+	timeoutCtx, cancel := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+	defer cancel()
 	_, err := d.iotHubClient.UpdateTwinState(timeoutCtx, reportedTwin)
 	if err != nil {
 		log.Debug().Err(err).Str("deviceID", d.deviceID).Msg("error sending reported properties update")
@@ -363,7 +365,8 @@ func (d *centralDevice) connectDevice() bool {
 	}
 
 	log.Trace().Str("deviceID", d.deviceID).Str("connectionString", d.connectionString).Msg("trying to connect to iothub")
-	timeoutCtx, _ := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+	timeoutCtx, cancel := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+	defer cancel()
 	if err = d.iotHubClient.Connect(timeoutCtx); err != nil {
 		d.isConnecting = false
 		log.Error().Err(err).Str("deviceID", d.deviceID).Msg("error connecting to IoT Hub")
@@ -385,7 +388,8 @@ func (d *centralDevice) connectDevice() bool {
 				iotdevice.WithLogger(logger.New(logger.LevelDebug, func(lvl logger.Level, s string) {
 					log.Trace().Msg(s)
 				})))
-			timeoutCtx, _ := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+			timeoutCtx, cancel := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+			defer cancel()
 			if err = d.iotHubClient.Connect(timeoutCtx); err != nil {
 				log.Error().Err(err).Str("deviceID", d.deviceID).Str("connectionString", d.connectionString).Msg("error connecting to IoT Hub")
 				return false
@@ -444,7 +448,8 @@ func (d *centralDevice) disconnectDevice() bool {
 // subscribeTwinUpdates creates subscription to monitor twin update (desired property) requests for a given device
 func (d *centralDevice) subscribeTwinUpdates() bool {
 	var err error
-	timeoutCtx, _ := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+	timeoutCtx, cancel := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+	defer cancel()
 	d.twinSub, err = d.iotHubClient.SubscribeTwinUpdates(timeoutCtx)
 	if err != nil {
 		// TODO: add retry
@@ -551,7 +556,8 @@ func (d *centralDevice) applyTwinUpdate(desiredTwin iotdevice.TwinState, forceUp
 		}
 	}
 
-	timeoutCtx, _ := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+	timeoutCtx, cancel := context.WithTimeout(d.context, time.Millisecond*time.Duration(10000))
+	defer cancel()
 	_, err := d.iotHubClient.UpdateTwinState(timeoutCtx, reportedTwin)
 	if err != nil {
 		log.Err(err).Str("deviceID", d.deviceID).Msg("twin update failed")
