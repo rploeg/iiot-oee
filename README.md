@@ -7,11 +7,10 @@ IoT Central sample for calculating Overall Equipment Effectiveness (OEE) of indu
 
 1. [What is OEE?](https://github.com/iot-for-all/iiot-oee#what-is-oee)
 2. [Architecture](https://github.com/iot-for-all/iiot-oee#architecture)
-3. [Setting up IoT Central Application](https://github.com/iot-for-all/iiot-oee#setting-up-iot-central-application)
-4. [Setting up ADX](https://github.com/iot-for-all/iiot-oee#setting-up-adx)
-5. [Setting up Contiunuous Data Export](https://github.com/iot-for-all/iiot-oee#setting-up-continuous-data-export)
-6. [Creating ADX Dashboard](https://github.com/iot-for-all/iiot-oee#creating-adx-dashboard)
-7. [Simulator](https://github.com/iot-for-all/iiot-oee#simulator)
+3. [Setting up ADX](https://github.com/iot-for-all/iiot-oee#setting-up-adx)
+4. [Setting up IoT Central Application](https://github.com/iot-for-all/iiot-oee#setting-up-iot-central-application)
+5. [Creating ADX Dashboard](https://github.com/iot-for-all/iiot-oee#creating-adx-dashboard)
+6. [Simulator](https://github.com/iot-for-all/iiot-oee#simulator)
 
 
 ## What is OEE? ##
@@ -20,17 +19,24 @@ ADD MORE INFO
 ## Architecture ##
 ADD MORE INFO
 
-## Setting up IoT Central Application ##
-ADD MORE INFO
 
 ## Setting up ADX ##
-ADD MORE INFO
+1. Create an Azure Data Explorer cluster.
+2. Create a new database in this cluster.
+3. Create a `boltmaker` table in this database. Schema can be found in the [boltmaker](setup/ADXDatabase.kql) file.
 
-## Setting up Contiunuous Data Export ##
-ADD MORE INFO
+## Setting up IoT Central Application ##
+1. Create an IoT Central application.
+2. Import the [Boltmaker](setup/BoltMaker.json) device template.
+3. Set up a new Continuous Data Export of all data coming from Boltmaker devices into ADX that was created earlier. You can get use the [JQ Transform](setup/CDETransform.jq) that is used below.
+
+![picture alt](images/CDE1.png "CDE Setup1")
+![picture alt](images/CDE2.png "CDE Setup2")
+
+More information on setting up data export to ADX can be found [here](https://docs.microsoft.com/en-us/azure/iot-central/core/howto-export-data?tabs=data-explorer%2Cjavascript%2Cservice-principal).
 
 ## Creating ADX Dashboard ##
-ADD MORE INFO
+Now that the ADX Database and the CDE exports are setup, you can setup the ADX dashbaord using the exported [dashboard](setup/ADXDashboard.json) file. Make sure that you change the datasource ID in the file to your ADX datasource. Feel free to create your own dashboard by looking at the sample queries in this file.
 
 ## Simulator ##
 You can [download binaries](https://github.com/iot-for-all/iiot-oee/releases) and run them as is, skip to [running simulator](https://github.com/iot-for-all/iiot-oee#running-simulator) section below.
