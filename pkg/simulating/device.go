@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"math/rand"
 	"net"
 	"os"
@@ -211,17 +212,28 @@ func (d *centralDevice) getTelemetryMessage() ([]byte, error) {
 		}
 	}
 
+	d.boltMachine.CpuLoad = math.Round(rand.Float64()*100.0*100.0) / 100.0
+	d.boltMachine.MemoryUsed = int64(rand.Float64() * 100.0 * 1024.0 * 1024.0)
+	d.boltMachine.MemoryFree = int64(256.0*1024.0*1024.0) - d.boltMachine.MemoryUsed
+	d.boltMachine.SystemDiskUsedPercent = 20 + rand.Intn(15)
+	d.boltMachine.SystemDiskFreePercent = 100 - d.boltMachine.SystemDiskUsedPercent
+
 	telemetry := models.BoltMachineTelemetryMessage{
-		PlantName:          d.boltMachine.PlantName,
-		ProductionLine:     d.boltMachine.ProductionLine,
-		ShiftNumber:        shiftNumber,
-		BatchNumber:        batchNumber,
-		MessageTimestamp:   time.Now().UTC(),
-		TotalPartsMade:     totalPartsMade,
-		DefectivePartsMade: defectivePartsMade,
-		MachineHealth:      d.boltMachine.MachineHealth,
-		OilLevel:           d.boltMachine.OilLevel,
-		Temperature:        d.boltMachine.Temperature,
+		PlantName:             d.boltMachine.PlantName,
+		ProductionLine:        d.boltMachine.ProductionLine,
+		ShiftNumber:           shiftNumber,
+		BatchNumber:           batchNumber,
+		MessageTimestamp:      time.Now().UTC(),
+		TotalPartsMade:        totalPartsMade,
+		DefectivePartsMade:    defectivePartsMade,
+		MachineHealth:         d.boltMachine.MachineHealth,
+		OilLevel:              d.boltMachine.OilLevel,
+		Temperature:           d.boltMachine.Temperature,
+		CpuLoad:               d.boltMachine.CpuLoad,
+		MemoryUsed:            d.boltMachine.MemoryUsed,
+		MemoryFree:            d.boltMachine.MemoryFree,
+		SystemDiskFreePercent: d.boltMachine.SystemDiskFreePercent,
+		SystemDiskUsedPercent: d.boltMachine.SystemDiskUsedPercent,
 	}
 
 	return d.getBoltTelemetryPayload(&telemetry, d.boltMachine.Format == "opcua")
@@ -250,8 +262,8 @@ func (d *centralDevice) sendTelemetryMessage(body []byte) bool {
 	}
 
 	// make sure that the device is connected
-	if d.isConnected == false {
-		if d.connectDevice() == false {
+	if !d.isConnected {
+		if !d.connectDevice() {
 			d.sendingTelemetry = false
 			return false
 		}
@@ -304,8 +316,8 @@ func (d *centralDevice) sendReportedProperties(reportedProps *models.ReportedPro
 	d.sendingReportedProps = true
 
 	// make sure that the device is connected
-	if d.isConnected == false {
-		if d.connectDevice() == false {
+	if !d.isConnected {
+		if !d.connectDevice() {
 			d.sendingReportedProps = false
 			return
 		}
@@ -342,7 +354,7 @@ func (d *centralDevice) sendReportedProperties(reportedProps *models.ReportedPro
 
 func (d *centralDevice) connectDevice() bool {
 	// provision the device for the first time
-	if d.provisionDevice() == false {
+	if !d.provisionDevice() {
 		return false
 	}
 
@@ -376,7 +388,7 @@ func (d *centralDevice) connectDevice() bool {
 		if errMsg == "not authorized" || errMsg == "server unavailable" || strings.Contains(errMsg, "network error") {
 			log.Trace().Str("deviceID", d.deviceID).Msg("detected hub fail over, re-provisioning device")
 
-			if d.provisionDevice() == false {
+			if !d.provisionDevice() {
 				return false
 			}
 
@@ -402,13 +414,13 @@ func (d *centralDevice) connectDevice() bool {
 	log.Trace().Err(err).Str("deviceID", d.deviceID).Msg("device connected to IoT Hub")
 
 	// register for twin updates
-	if d.subscribeTwinUpdates() == false {
+	if !d.subscribeTwinUpdates() {
 		d.isConnecting = false
 		return false
 	}
 
 	// register for c2d commands
-	if d.subscribeCommands() == false {
+	if !d.subscribeCommands() {
 		d.isConnecting = false
 		return false
 	}
@@ -466,7 +478,7 @@ func (d *centralDevice) subscribeTwinUpdates() bool {
 			case desiredTwin := <-d.twinSub.C():
 				dt, _ := json.Marshal(desiredTwin)
 				log.Trace().Str("deviceID", d.deviceID).
-					Str("desiredTwin", fmt.Sprintf("%s", dt)).
+					Str("desiredTwin", string(dt)).
 					Msg("got twin update")
 
 				// acknowledge twin update by echoing reported properties
@@ -565,7 +577,7 @@ func (d *centralDevice) applyTwinUpdate(desiredTwin iotdevice.TwinState, forceUp
 	} else {
 		rt, _ := json.Marshal(reportedTwin)
 		log.Debug().Str("deviceID", d.deviceID).
-			Str("reportedProperties", fmt.Sprintf("%s", rt)).
+			Str("reportedProperties", string(rt)).
 			Msg("acknowledged twin update")
 	}
 
@@ -597,20 +609,20 @@ func (d *centralDevice) applyInitialTwinState() bool {
 	return true
 }
 
-func (d *centralDevice) getStringTwinValue(name string, value interface{}, desiredVersion int) (string, map[string]interface{}, bool) {
-	stringVal, ok := value.(string)
-	if !ok {
-		log.Error().Str(name, fmt.Sprintf("%v", value)).Msg("got illegal twin data")
-		return "", nil, false
-	}
-	responseTwin := map[string]interface{}{
-		"value": value,
-		"ac":    200,
-		"ad":    "completed",
-		"av":    desiredVersion,
-	}
-	return stringVal, responseTwin, true
-}
+// func (d *centralDevice) getStringTwinValue(name string, value interface{}, desiredVersion int) (string, map[string]interface{}, bool) {
+// 	stringVal, ok := value.(string)
+// 	if !ok {
+// 		log.Error().Str(name, fmt.Sprintf("%v", value)).Msg("got illegal twin data")
+// 		return "", nil, false
+// 	}
+// 	responseTwin := map[string]interface{}{
+// 		"value": value,
+// 		"ac":    200,
+// 		"ad":    "completed",
+// 		"av":    desiredVersion,
+// 	}
+// 	return stringVal, responseTwin, true
+// }
 
 func (d *centralDevice) getIntTwinValue(name string, value interface{}, desiredVersion int) (int, map[string]interface{}, bool) {
 	floatVal, ok := value.(float64)
@@ -652,18 +664,18 @@ func (d *centralDevice) getReportedProperties() (*models.ReportedProperties, err
 }
 
 // sleep sleeps for the given duration with cancellation context
-func (d *centralDevice) sleep(ctx context.Context, duration time.Duration) {
-	select {
-	case <-ctx.Done():
-		return
-	case <-time.After(duration):
-	}
-}
+// func (d *centralDevice) sleep(ctx context.Context, duration time.Duration) {
+// 	select {
+// 	case <-ctx.Done():
+// 		return
+// 	case <-time.After(duration):
+// 	}
+// }
 
 // randSleep sleeps for random time within the given min/max range with cancellation context
-func (d *centralDevice) randSleep(ctx context.Context, minMs int, maxMs int) {
-	d.sleep(ctx, time.Millisecond*time.Duration(minMs+rand.Intn(maxMs)))
-}
+// func (d *centralDevice) randSleep(ctx context.Context, minMs int, maxMs int) {
+// 	d.sleep(ctx, time.Millisecond*time.Duration(minMs+rand.Intn(maxMs)))
+// }
 
 func (d *centralDevice) getHostName() string {
 	hostname, err := os.Hostname()
@@ -779,6 +791,6 @@ func (d *centralDevice) getString(length int) string {
 }
 
 //getTime gets the current time as string.
-func (d *centralDevice) getTime() string {
-	return time.Now().UTC().Format(time.RFC3339)
-}
+// func (d *centralDevice) getTime() string {
+// 	return time.Now().UTC().Format(time.RFC3339)
+// }

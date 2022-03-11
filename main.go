@@ -44,16 +44,21 @@ func main() {
 			log.Debug().Int("BoltMachine", i).Msg("Starting up bolt machine")
 			deviceID := fmt.Sprintf("%s-BoltMachine-%d", plant.Name, i)
 			boltMachine := models.BoltMachine{
-				PlantName:          plant.Name,
-				ProductionLine:     fmt.Sprintf("ProductionLine %d", i),
-				ShiftNumber:        0,
-				BatchNumber:        0,
-				TotalPartsMade:     0,
-				DefectivePartsMade: 0,
-				MachineHealth:      "Healthy",
-				OilLevel:           100,
-				Temperature:        100,
-				Format:             plant.BoltMachine.Format,
+				PlantName:             plant.Name,
+				ProductionLine:        fmt.Sprintf("ProductionLine %d", i),
+				ShiftNumber:           0,
+				BatchNumber:           0,
+				TotalPartsMade:        0,
+				DefectivePartsMade:    0,
+				MachineHealth:         "Healthy",
+				OilLevel:              100,
+				Temperature:           100,
+				CpuLoad:               50.0,
+				SystemDiskUsedPercent: 50.0,
+				SystemDiskFreePercent: 50.0,
+				MemoryUsed:            56 * 1024 * 1024,
+				MemoryFree:            200 * 1024 * 1024,
+				Format:                plant.BoltMachine.Format,
 			}
 			device := simulating.NewDevice(ctx, &cfg.Application, deviceID, &boltMachine)
 

@@ -162,6 +162,51 @@
         },
         "name": "temperature",
         "schema": "double"
+      },
+      {
+        "@id": "dtmi:parnellAerospace:BoltMakerV1:cpuLoad;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "CPU Load"
+        },
+        "name": "cpuLoad",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:parnellAerospace:BoltMakerV1:systemDiskUsedPercent;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "System Disk Used Percent"
+        },
+        "name": "systemDiskUsedPercent",
+        "schema": "integer"
+      },
+      {
+        "@id": "dtmi:parnellAerospace:BoltMakerV1:systemDiskFreePercent;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "System Disk Free Percent"
+        },
+        "name": "systemDiskFreePercent",
+        "schema": "integer"
+      },
+      {
+        "@id": "dtmi:parnellAerospace:BoltMakerV1:memoryUsed;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "Memory Used"
+        },
+        "name": "memoryUsed",
+        "schema": "long"
+      },
+      {
+        "@id": "dtmi:parnellAerospace:BoltMakerV1:memoryFree;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "Memory Free"
+        },
+        "name": "memoryFree",
+        "schema": "long"
       }
     ],
     "displayName": {
