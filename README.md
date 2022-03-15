@@ -15,9 +15,9 @@ IoT Central sample for calculating Overall Equipment Effectiveness (OEE) of indu
 
 ## What is OEE? ##
 Overall Equipment Effectiveness (OEE) is a measure of how well a manufacturing operation is utilized (facilities, time and material) compared to its full potential, during the periods when it is scheduled to run. [References](https://en.wikipedia.org/wiki/Overall_equipment_effectiveness). OEE is the industry standard for measuring manufacturing productivity. OEE is calculated using 3 atttrbiutes
-1. Availability: accounts for planned and unplanned stoppages, percentage of scheduled time that the operation is/was available to operate
-2. Performance: measure of speed at which the work happens, percentage of its designed speed
-3. Quality: percentage of good units produced compared to the total units planned/produced
+1. **Availability:** accounts for planned and unplanned stoppages, percentage of scheduled time that the operation is/was available to operate
+2. **Performance:** measure of speed at which the work happens, percentage of its designed speed
+3. **Quality:** percentage of good units produced compared to the total units planned/produced
 
 ## Scenario ##
 Parnell Aerospace a fictitious company has launched a Factory of the Future manufacturing initiative to streamline operations and increase production capacity at its plants and production lines. The employees use IoT Central app to assess each shift in the plant based on the signals received from the factory equipment to calculate shift effectiveness and communicate with equipment operators and then adjust the factory equipment accordingly. 
@@ -27,6 +27,13 @@ Parnell Aerospace a fictitious company has launched a Factory of the Future manu
 Watch a 5 minute overview of the experience
 
 [![Scenario](/images/videoimage.png)](https://youtu.be/VGrARGdHlyo)
+
+## Architecture ##
+
+![picture alt](images/oeearch.png "OEE Application Architecture")
+The above picture shows the architecture of this OEE Application. Devices send telemetry messages to IoT Central application. This data is transformed and exported to Azure Data Explorer using the Continuous Data Export (CDE) in the IoT Central application. Dashboard over OEE database is built using KQL queries on the ADX database. 
+
+Note that there is no external application or compute is used for "cooking the data".
 
 ## Setting up ADX ##
 1. Create an Azure Data Explorer cluster.
