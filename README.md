@@ -26,7 +26,7 @@ Parnell Aerospace a fictitious company has launched a Factory of the Future manu
 
 Watch a 5 minute overview of the experience
 
-[![IoT Central Companion Experience - Contoso Drive](/images/parnell.png)](https://youtu.be/VGrARGdHlyo)
+[![Scenario](/images/videoimage.png)](https://youtu.be/VGrARGdHlyo)
 
 ## Setting up ADX ##
 1. Create an Azure Data Explorer cluster.
