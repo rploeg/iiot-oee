@@ -6,7 +6,7 @@ IoT Central sample for calculating Overall Equipment Effectiveness (OEE) of indu
 ## Contents ##
 
 1. [What is OEE?](https://github.com/iot-for-all/iiot-oee#what-is-oee)
-2. [Architecture](https://github.com/iot-for-all/iiot-oee#architecture)
+2. [Architecture](https://github.com/iot-for-all/iiot-oee#scenario)
 3. [Setting up ADX](https://github.com/iot-for-all/iiot-oee#setting-up-adx)
 4. [Setting up IoT Central Application](https://github.com/iot-for-all/iiot-oee#setting-up-iot-central-application)
 5. [Creating ADX Dashboard](https://github.com/iot-for-all/iiot-oee#creating-adx-dashboard)
@@ -14,11 +14,19 @@ IoT Central sample for calculating Overall Equipment Effectiveness (OEE) of indu
 
 
 ## What is OEE? ##
-ADD MORE INFO
+Overall Equipment Effectiveness (OEE) is a measure of how well a manufacturing operation is utilized (facilities, time and material) compared to its full potential, during the periods when it is scheduled to run. [References](https://en.wikipedia.org/wiki/Overall_equipment_effectiveness). OEE is the industry standard for measuring manufacturing productivity. OEE is calculated using 3 atttrbiutes
+1. Availability: accounts for planned and unplanned stoppages, percentage of scheduled time that the operation is/was available to operate
+2. Performance: measure of speed at which the work happens, percentage of its designed speed
+3. Quality: percentage of good units produced compared to the total units planned/produced
 
-## Architecture ##
-ADD MORE INFO
+## Scenario ##
+Parnell Aerospace a fictitious company has launched a Factory of the Future manufacturing initiative to streamline operations and increase production capacity at its plants and production lines. The employees use IoT Central app to assess each shift in the plant based on the signals received from the factory equipment to calculate shift effectiveness and communicate with equipment operators and then adjust the factory equipment accordingly. 
 
+![picture alt](images/parnell.png "Plants and Production Lines")
+
+Watch a 5 minute overview of the experience
+
+[![IoT Central Companion Experience - Contoso Drive](/images/parnell.png)](https://youtu.be/VGrARGdHlyo)
 
 ## Setting up ADX ##
 1. Create an Azure Data Explorer cluster.
