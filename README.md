@@ -33,7 +33,7 @@ Watch a 5 minute overview of the experience
 ![picture alt](images/oeearch.png "OEE Application Architecture")
 The above picture shows the architecture of this OEE Application. Devices send telemetry messages to IoT Central application. This data is transformed and exported to Azure Data Explorer using the Continuous Data Export (CDE) in the IoT Central application. Dashboard over OEE database is built using KQL queries on the ADX database. 
 
-Note that there is no external application or compute is used for "cooking the data".
+There is no need for an external application or compute for "cooking the data". It is done in IoT Central at no extra charge.
 
 ## Setting up ADX ##
 1. Create an Azure Data Explorer cluster.
